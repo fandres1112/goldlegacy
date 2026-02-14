@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@prisma/client";
+import { formatPriceCOP } from "@/lib/formatPrice";
+import { WishlistButton } from "./WishlistButton";
 
 type Props = {
   product: Product & {
@@ -32,6 +34,9 @@ export function ProductCard({ product }: Props) {
             Destacado
           </span>
         )}
+        <div className="absolute top-3 right-3 z-10">
+          <WishlistButton productId={product.id} size="sm" />
+        </div>
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-3 right-3 rounded-full bg-gold/90 backdrop-blur-sm p-2 text-black shadow-lg">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +46,7 @@ export function ProductCard({ product }: Props) {
         </div>
       </div>
       <div className="flex flex-col gap-1 px-1 pb-1">
-        <p className="text-xs text-gray-500 uppercase tracking-[0.2em] group-hover:text-gold-light transition-colors">
+        <p className="text-xs text-foreground-muted uppercase tracking-[0.2em] group-hover:text-gold-light transition-colors">
           {product.category?.name ?? "Colección Gold Legacy"}
         </p>
         <h3 className="text-base font-medium line-clamp-2 group-hover:text-gold transition-colors">
@@ -52,7 +57,7 @@ export function ProductCard({ product }: Props) {
         </p>
         <p className="mt-2 text-sm">
           <span className="text-gold font-semibold text-base">
-            {product.price.toString()} USD
+            {formatPriceCOP(Number(product.price))}
           </span>
         </p>
       </div>

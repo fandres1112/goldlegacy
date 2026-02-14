@@ -6,7 +6,7 @@ export default function AboutPage() {
       <SectionTitle
         eyebrow="Tradición familiar hecha joya"
         title="Un manifiesto de lujo silencioso."
-        description="Gold Legacy nace de una obsesión compartida: crear piezas en oro que se sientan impecables en el presente y sigan teniendo sentido dentro de veinte años."
+        description="Gold Legacy nace de una obsesión compartida, crear piezas en oro que se sientan impecables en el presente y sigan teniendo sentido dentro de veinte años."
       />
 
       <div className="grid md:grid-cols-2 gap-10 text-sm text-muted">

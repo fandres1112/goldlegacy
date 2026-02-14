@@ -21,7 +21,7 @@ export default async function HomePage() {
   return (
     <div>
       {/* ——— HERO ——— */}
-      <section className="relative min-h-[92vh] flex flex-col justify-center overflow-hidden border-b border-white/[0.06] bg-black">
+      <section className="relative min-h-[92vh] flex flex-col justify-center overflow-hidden border-b border-border bg-background">
         <div className="absolute inset-0 w-full h-full">
           <Image
             src="/hero-bg-full.png"
@@ -33,7 +33,7 @@ export default async function HomePage() {
           />
         </div>
         {/* Capa oscura sobre el fondo del hero */}
-        <div className="absolute inset-0 bg-black/50 pointer-events-none" aria-hidden />
+        <div className="absolute inset-0 bg-background/60 pointer-events-none" aria-hidden />
         <div
           className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,_rgba(212,175,55,0.2),_transparent_55%)] animate-gold-glow"
           aria-hidden
@@ -43,8 +43,8 @@ export default async function HomePage() {
           style={{ animationDelay: "1s" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 from-0% via-black/35 via-45% to-transparent to-100% pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_25%_50%,_black/55%,_transparent_65%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 from-0% via-background/50 via-45% to-transparent to-100% pointer-events-none" />
+        <div className="absolute inset-0 hero-radial pointer-events-none" aria-hidden />
 
         <div className="container-page relative z-10 py-20 md:py-28">
           <div className="max-w-4xl">
@@ -52,37 +52,39 @@ export default async function HomePage() {
               className="text-[11px] uppercase tracking-[0.35em] text-gold/90 mb-8 animate-in opacity-0"
               style={{ animation: "fadeIn 0.8s ease-out 0.2s forwards" }}
             >
-              Nueva colección · 2026
+              Joyas con historia · Oro que perdura
             </p>
             <h1
-              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.08] mb-8 animate-in opacity-0"
+              className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[1.08] mb-6 animate-in opacity-0"
               style={{ animation: "fadeIn 0.8s ease-out 0.4s forwards" }}
             >
-              Oro minimalista
-              <br />
-              para un{" "}
+              Tradición familiar{" "}
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent">
-                  legado
+                  hecha joya
                 </span>
                 <span
                   className="absolute -inset-2 bg-gradient-to-r from-gold/25 via-gold/50 to-gold/25 blur-2xl -z-10 animate-gold-glow rounded-full"
                   aria-hidden
                 />
-              </span>{" "}
-              eterno.
+              </span>
+              .
             </h1>
             <p
-              className="text-white text-base md:text-lg max-w-xl leading-relaxed mb-10 animate-in opacity-0"
+              className="font-display text-xl sm:text-2xl md:text-3xl text-foreground tracking-tight mb-6 animate-in opacity-0"
+              style={{ animation: "fadeIn 0.8s ease-out 0.5s forwards" }}
+            >
+              Piezas en oro para ti y los tuyos.
+            </p>
+            <p
+              className="text-foreground text-base md:text-lg max-w-xl leading-relaxed mb-10 animate-in opacity-0"
               style={{ animation: "fadeIn 0.8s ease-out 0.6s forwards" }}
             >
-              Gold Legacy nace desde una tradición familiar hecha joya
-              <br />
-              Piezas en oro diseñadas con líneas puras, proporciones precisas y una presencia sutilmente poderosa.
+              Cada pieza nace de un taller familiar donde el cuidado al detalle y el oro de calidad se unen. Para tu día a día, para regalar o para guardar como legado: joyas que cuentan tu historia.
             </p>
             <div
               className="flex flex-wrap gap-4 animate-in opacity-0"
-              style={{ animation: "fadeIn 0.8s ease-out 0.8s forwards" }}
+              style={{ animation: "fadeIn 0.8s ease-out 0.9s forwards" }}
             >
               <Link
                 href="/catalogo"
@@ -102,7 +104,7 @@ export default async function HomePage() {
       </section>
 
       {/* ——— DESTACADOS ——— */}
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-border">
         <div className="container-page py-20 md:py-28">
           <SectionTitle
             eyebrow="Selección"
@@ -147,10 +149,10 @@ export default async function HomePage() {
       </section>
 
       {/* ——— FRASE ——— */}
-      <section className="border-b border-white/[0.06] bg-gradient-to-b from-surface/50 to-background">
+      <section className="border-b border-border bg-gradient-to-b from-surface/50 to-background">
         <div className="container-page py-16 md:py-24">
           <div className="max-w-2xl mx-auto text-center">
-            <p className="font-display text-2xl sm:text-3xl md:text-4xl text-white/90 leading-snug tracking-tight">
+            <p className="font-display text-2xl sm:text-3xl md:text-4xl text-foreground leading-snug tracking-tight">
               Tradición familiar hecha joya.
             </p>
             <div className="mt-8 h-px w-16 mx-auto bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
@@ -166,10 +168,10 @@ export default async function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_100%,_rgba(212,175,55,0.08),_transparent_70%)]" aria-hidden />
         <div className="container-page relative z-10 py-20 md:py-28 text-center">
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-foreground tracking-tight mb-4">
             Tu legado empieza aquí
           </h2>
-          <p className="text-white/60 text-sm md:text-base max-w-md mx-auto mb-8">
+          <p className="text-foreground-muted text-sm md:text-base max-w-md mx-auto mb-8">
             Descubre piezas en oro que te acompañarán por años. Envíos a todo el país.
           </p>
           <Link href="/catalogo" className="btn-primary inline-flex items-center gap-2">

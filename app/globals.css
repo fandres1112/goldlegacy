@@ -6,6 +6,28 @@
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "SF Pro Display", sans-serif;
   --font-display: "Playfair Display", "Times New Roman", serif;
+  /* Tema oscuro (default) */
+  --color-background: #0A0E17;
+  --color-surface: #121A28;
+  --color-foreground: #ffffff;
+  --color-foreground-muted: #9ca3af;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-input-bg: rgba(0, 0, 0, 0.4);
+  --color-input-border: rgba(255, 255, 255, 0.1);
+  --color-surface-glass: rgba(18, 26, 40, 0.92);
+  --color-hero-radial: radial-gradient(ellipse 70% 80% at 25% 50%, rgba(10, 14, 23, 0.7), transparent 65%);
+}
+
+[data-theme="light"] {
+  --color-background: #F5F2EB;
+  --color-surface: #FFFDF7;
+  --color-foreground: #1A1814;
+  --color-foreground-muted: #5C5854;
+  --color-border: rgba(26, 24, 20, 0.12);
+  --color-input-bg: rgba(255, 255, 255, 0.95);
+  --color-input-border: rgba(26, 24, 20, 0.15);
+  --color-surface-glass: rgba(255, 253, 247, 0.95);
+  --color-hero-radial: radial-gradient(ellipse 70% 80% at 25% 50%, rgba(245, 242, 235, 0.82), transparent 65%);
 }
 
 html,
@@ -15,7 +37,9 @@ body {
 }
 
 body {
-  @apply bg-background text-white antialiased;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  @apply antialiased;
 }
 
 a {
@@ -31,11 +55,13 @@ a:hover {
 }
 
 .glass-surface {
-  @apply bg-surface/90 border border-white/10 backdrop-blur-xl shadow-xl;
+  background-color: var(--color-surface-glass);
+  border: 1px solid var(--color-border);
+  @apply backdrop-blur-xl shadow-xl;
 }
 
 .btn {
-  @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all duration-300;
+  @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium tracking-wide transition-all duration-300;
 }
 
 .btn-primary {
@@ -55,7 +81,28 @@ a:hover {
 }
 
 .text-muted {
-  @apply text-gray-400;
+  color: var(--color-foreground-muted);
+}
+
+.input-theme {
+  background-color: var(--color-input-bg);
+  border-color: var(--color-input-border);
+}
+
+.hero-radial {
+  background: var(--color-hero-radial);
+}
+
+/* Panel del dropdown de cuenta: 90% opacidad + ligero desenfoque */
+.dropdown-panel {
+  background: rgba(18, 26, 40, 0.90);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+[data-theme="light"] .dropdown-panel {
+  background: rgba(255, 253, 247, 0.90);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 /* Sombra de texto para legibilidad del hero sobre la imagen dorada */
@@ -191,3 +238,61 @@ a:hover {
 .animate-float {
   animation: float 5s ease-in-out infinite;
 }
+
+/* Gráficos Tremor/Recharts en panel admin: texto y colores visibles sobre fondo oscuro */
+.admin-charts .recharts-text,
+.admin-charts .recharts-cartesian-axis-tick text,
+.admin-charts .recharts-legend-item-text,
+.admin-charts tspan {
+  fill: rgba(229, 231, 235, 0.95) !important;
+}
+
+.admin-charts .recharts-legend-item,
+.admin-charts [class*="tremor"] {
+  color: rgba(229, 231, 235, 0.95);
+}
+
+.admin-charts .recharts-default-legend .recharts-legend-item text {
+  fill: rgba(229, 231, 235, 0.95) !important;
+}
+
+[data-theme="light"] .admin-charts .recharts-text,
+[data-theme="light"] .admin-charts .recharts-cartesian-axis-tick text,
+[data-theme="light"] .admin-charts .recharts-legend-item-text,
+[data-theme="light"] .admin-charts tspan,
+[data-theme="light"] .admin-charts .recharts-legend-item,
+[data-theme="light"] .admin-charts [class*="tremor"] {
+  fill: #1A1814 !important;
+  color: #1A1814 !important;
+}
+[data-theme="light"] .admin-charts .recharts-default-legend .recharts-legend-item text {
+  fill: #1A1814 !important;
+}
+
+/* Colores de las series (barras, áreas, líneas, donut) para que se vean en fondo oscuro */
+.admin-charts .recharts-bar-rectangle {
+  fill: #d4af37 !important; /* gold */
+}
+
+.admin-charts .recharts-area-area:nth-of-type(1) {
+  fill: #f59e0b !important; /* amber */
+}
+.admin-charts .recharts-area-area:nth-of-type(2) {
+  fill: #eab308 !important; /* yellow */
+}
+.admin-charts .recharts-area-curve,
+.admin-charts .recharts-line-curve {
+  stroke: #f59e0b !important;
+}
+.admin-charts .recharts-area-curve:nth-of-type(2),
+.admin-charts .recharts-line-curve:nth-of-type(2) {
+  stroke: #eab308 !important;
+}
+
+/* Donut: un color por sector (ámbar, amarillo, dorado, naranja) */
+.admin-charts .recharts-pie-sector:nth-child(1) { fill: #f59e0b !important; }
+.admin-charts .recharts-pie-sector:nth-child(2) { fill: #eab308 !important; }
+.admin-charts .recharts-pie-sector:nth-child(3) { fill: #d4af37 !important; }
+.admin-charts .recharts-pie-sector:nth-child(4) { fill: #f97316 !important; }
+.admin-charts .recharts-pie-sector:nth-child(5) { fill: #fbbf24 !important; }
+.admin-charts .recharts-pie-sector:nth-child(n+6) { fill: #fcd34d !important; }

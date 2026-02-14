@@ -78,7 +78,7 @@ function FilterPill({ label, active, onClick }: PillProps) {
       className={`rounded-full px-3 py-1 border text-xs transition-colors ${
         active
           ? "border-gold bg-gold/10 text-gold"
-          : "border-white/10 text-gray-300 hover:border-gold/60 hover:text-gold"
+          : "border-border text-foreground-muted hover:border-gold/60 hover:text-gold"
       }`}
     >
       {label}

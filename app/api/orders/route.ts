@@ -1,20 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromCookie, requireAdmin } from "@/lib/auth";
+import { getUserFromCookie } from "@/lib/auth";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 import { z } from "zod";
 
 const orderItemSchema = z.object({
-  productId: z.string(),
-  quantity: z.number().int().positive()
+  productId: z.string().min(1, "productId requerido"),
+  quantity: z.coerce.number().int().positive("cantidad debe ser al menos 1")
 });
 
 const orderCreateSchema = z.object({
-  customerName: z.string().min(2),
-  customerEmail: z.string().email(),
-  customerPhone: z.string().optional(),
-  shippingAddress: z.string().min(5),
-  shippingCity: z.string().min(2),
-  items: z.array(orderItemSchema).min(1)
+  customerName: z.string().min(2, "Nombre de al menos 2 caracteres").transform((s) => s.trim()),
+  customerEmail: z.string().email("Email inválido").transform((s) => s.trim()),
+  customerPhone: z.string().optional().transform((s) => (s && s.trim()) || undefined),
+  shippingAddress: z.string().min(5, "Dirección de al menos 5 caracteres").transform((s) => s.trim()),
+  shippingCity: z.string().min(2, "Ciudad de al menos 2 caracteres").transform((s) => s.trim()),
+  items: z.array(orderItemSchema).min(1, "Agrega al menos un producto al carrito")
 });
 
 export async function POST(req: NextRequest) {
@@ -52,9 +53,7 @@ export async function POST(req: NextRequest) {
         const product = products.find((p) => p.id === item.productId)!;
         await tx.product.update({
           where: { id: product.id },
-          data: {
-            stock: product.stock - item.quantity
-          }
+          data: { stock: product.stock - item.quantity }
         });
       }
 
@@ -90,12 +89,29 @@ export async function POST(req: NextRequest) {
       return order;
     });
 
+    await sendOrderConfirmationEmail({
+      id: result.id,
+      customerName: result.customerName,
+      customerEmail: result.customerEmail,
+      total: Number(result.total),
+      shippingAddress: result.shippingAddress,
+      shippingCity: result.shippingCity,
+      createdAt: result.createdAt,
+      items: result.items.map((i) => ({
+        product: { name: i.product.name },
+        quantity: i.quantity,
+        unitPrice: Number(i.unitPrice)
+      }))
+    });
+
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error(error);
     if (error instanceof z.ZodError) {
+      const first = error.issues[0];
+      const message = first?.message ?? "Datos de orden inválidos";
       return NextResponse.json(
-        { error: "Datos de orden inválidos", issues: error.issues },
+        { error: message, issues: error.issues },
         { status: 400 }
       );
     }

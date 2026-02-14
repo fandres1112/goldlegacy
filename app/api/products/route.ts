@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
 
   const page = Number(searchParams.get("page") ?? "1");
   const pageSize = Number(searchParams.get("pageSize") ?? "12");
+  const idsParam = searchParams.get("ids");
   const type = searchParams.get("type");
   const material = searchParams.get("material");
   const categorySlug = searchParams.get("category");
@@ -30,6 +31,13 @@ export async function GET(req: NextRequest) {
   const featured = searchParams.get("featured");
 
   const where: any = {};
+
+  if (idsParam) {
+    const ids = idsParam.split(",").map((s) => s.trim()).filter(Boolean);
+    if (ids.length > 0) {
+      where.id = { in: ids };
+    }
+  }
 
   if (type && type in ProductType) {
     where.type = type;
@@ -57,8 +65,8 @@ export async function GET(req: NextRequest) {
   }
 
   if (categorySlug) {
-    const category = await prisma.category.findUnique({
-      where: { slug: categorySlug }
+    const category = await prisma.category.findFirst({
+      where: { slug: categorySlug, isActive: true }
     });
     if (category) {
       where.categoryId = category.id;

@@ -2,7 +2,8 @@
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}"
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
@@ -12,8 +13,11 @@ module.exports = {
           DEFAULT: "#D4AF37",
           dark: "#B1891F"
         },
-        background: "#050507",
-        surface: "#0B0B0F"
+        background: "var(--color-background)",
+        surface: "var(--color-surface)",
+        foreground: "var(--color-foreground)",
+        "foreground-muted": "var(--color-foreground-muted)",
+        border: "var(--color-border)"
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

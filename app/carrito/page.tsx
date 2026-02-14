@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCart } from "@/components/cart/CartContext";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "@/components/ui/Toast";
+import { formatPriceCOP } from "@/lib/formatPrice";
 
 export default function CartPage() {
   const { items, total, removeItem, updateQuantity, itemCount } = useCart();
@@ -77,7 +78,7 @@ export default function CartPage() {
                     {item.name}
                   </p>
                   <p className="text-xs text-muted mb-3">
-                    {item.price.toFixed(2)} USD · Oro certificado
+                    {formatPriceCOP(item.price)} · Oro certificado
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 border border-white/10 rounded-full overflow-hidden">
@@ -111,11 +112,11 @@ export default function CartPage() {
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-lg text-gold font-semibold">
-                    {(item.price * item.quantity).toFixed(2)} USD
+                    {formatPriceCOP(item.price * item.quantity)}
                   </p>
                   {item.quantity > 1 && (
                     <p className="text-xs text-muted mt-1">
-                      {item.price.toFixed(2)} c/u
+                      {formatPriceCOP(item.price)} c/u
                     </p>
                   )}
                 </div>
@@ -135,7 +136,7 @@ export default function CartPage() {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted">Subtotal</span>
                   <span className="font-semibold text-gold text-lg">
-                    {total.toFixed(2)} USD
+                    {formatPriceCOP(total)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted pt-2 border-t border-white/5">

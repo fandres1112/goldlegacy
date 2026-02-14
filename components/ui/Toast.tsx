@@ -54,7 +54,7 @@ export function ToastContainer() {
               <X className="h-5 w-5 text-red-400" />
             )}
           </div>
-          <p className="text-sm text-white flex-1">{toast.message}</p>
+          <p className="text-sm text-foreground flex-1">{toast.message}</p>
         </div>
       ))}
     </div>

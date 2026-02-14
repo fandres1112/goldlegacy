@@ -11,7 +11,7 @@ async function main() {
     update: {},
     create: {
       email: "admin@goldlegacy.com",
-      name: "Administrador GoldLegacy",
+      name: "Administrador Gold Legacy",
       passwordHash,
       role: UserRole.ADMIN
     }
@@ -53,11 +53,11 @@ async function main() {
     where: { slug: "cadena-goldlegacy-essential-3mm" },
     update: {},
     create: {
-      name: "Cadena GoldLegacy Essential 3mm",
+      name: "Cadena Gold Legacy Essential 3mm",
       slug: "cadena-goldlegacy-essential-3mm",
       description:
         "Cadena minimalista en oro 18k con diseño de eslabón fino. Ideal para uso diario con un toque de lujo discreto.",
-      price: 189.99,
+      price: 760000,
       material: "Oro 18k",
       type: ProductType.CHAIN,
       images: [
@@ -74,11 +74,11 @@ async function main() {
     where: { slug: "anillo-signature-goldlegacy" },
     update: {},
     create: {
-      name: "Anillo Signature GoldLegacy",
+      name: "Anillo Signature Gold Legacy",
       slug: "anillo-signature-goldlegacy",
       description:
         "Anillo en oro 18k con acabado espejo y perfil limpio. Diseñado para quienes buscan un statement minimalista.",
-      price: 229.0,
+      price: 920000,
       material: "Oro 18k",
       type: ProductType.RING,
       images: [
@@ -95,11 +95,11 @@ async function main() {
     where: { slug: "pulsera-goldlegacy-woven" },
     update: {},
     create: {
-      name: "Pulsera GoldLegacy Woven",
+      name: "Pulsera Gold Legacy Woven",
       slug: "pulsera-goldlegacy-woven",
       description:
         "Pulsera tejida en oro 18k con textura orgánica y tacto cómodo. Diseñada para acompañarte todos los días.",
-      price: 159.9,
+      price: 640000,
       material: "Oro 18k",
       type: ProductType.BRACELET,
       images: [

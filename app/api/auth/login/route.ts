@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().transform((s) => s.trim().toLowerCase()),
   password: z.string().min(6)
 });
 

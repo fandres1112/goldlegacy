@@ -39,6 +39,7 @@ En `.env` configura:
 
 - **DATABASE_URL**: cadena de conexión a PostgreSQL
 - **JWT_SECRET**: clave secreta para firmar JWT
+- **SMTP** (opcional): para enviar email de confirmación al crear una orden. Con Mailtrap (pruebas) usa `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` y opcionalmente `MAIL_FROM`. Si no se configuran, las órdenes se crean igual pero no se envía el correo.
 
 Ejemplo:
 
@@ -98,13 +99,18 @@ La app quedará disponible en `http://localhost:3000`.
   - `carrito/page.tsx`: vista del carrito (estado en cliente).
   - `checkout/page.tsx`: formulario de checkout que crea la orden en BD.
   - `sobre-nosotros/page.tsx`: página estática de marca.
+  - `lista-deseos/page.tsx`: lista de favoritos (estado en localStorage).
+  - `registro/page.tsx` y `iniciar-sesion/page.tsx`: alta e inicio de sesión de clientes.
+  - `mis-ordenes/page.tsx`: historial de pedidos del usuario autenticado.
   - `admin/page.tsx`: panel administrativo con login y dashboard de resumen.
 
 - **`app/api/`** (API Routes):
   - `auth/login`: login admin/usuario con JWT en cookie httpOnly.
+  - `auth/register`: registro de clientes (email, contraseña, nombre opcional); asigna rol USER.
+  - `auth/logout`: borra la cookie de sesión.
   - `auth/me`: devuelve el usuario actual (si está autenticado).
   - `products`:
-    - `GET /api/products`: listado con filtros (tipo, material, precio, categoría, destacados, paginación).
+    - `GET /api/products`: listado con filtros (tipo, material, precio, categoría, destacados, paginación, `ids` para lista de deseos).
     - `POST /api/products`: creación de productos (solo admin).
     - `GET /api/products/[slug]`: detalle de un producto.
     - `PATCH /api/products/[slug]`: actualización (solo admin).
@@ -207,6 +213,6 @@ npm start
 
 - Pasarela de pago real (Stripe, MercadoPago, etc.).
 - Gestión visual completa de CRUD de productos e inventario desde `/admin`.
-- Wishlist y cuentas de usuario finales (registro/login de clientes).
+- ~~Wishlist y cuentas de usuario finales (registro/login de clientes).~~ Implementado: lista de deseos (localStorage), registro, iniciar sesión y Mis órdenes.
 - Internacionalización (ES/EN) y multimoneda.
 

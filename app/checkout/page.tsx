@@ -1,12 +1,12 @@
 'use client';
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useCart } from "@/components/cart/CartContext";
+import { formatPriceCOP } from "@/lib/formatPrice";
 
 export default function CheckoutPage() {
   const { items, total, clear } = useCart();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -30,35 +30,29 @@ export default function CheckoutPage() {
     const formData = new FormData(e.currentTarget);
 
     const payload = {
-      customerName: formData.get("name") as string,
-      customerEmail: formData.get("email") as string,
-      customerPhone: (formData.get("phone") as string) || undefined,
-      shippingAddress: formData.get("address") as string,
-      shippingCity: formData.get("city") as string,
+      customerName: String(formData.get("name") ?? "").trim(),
+      customerEmail: String(formData.get("email") ?? "").trim(),
+      customerPhone: (formData.get("phone") as string)?.trim() || undefined,
+      shippingAddress: String(formData.get("address") ?? "").trim(),
+      shippingCity: String(formData.get("city") ?? "").trim(),
       items: items.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity
+        productId: String(item.productId),
+        quantity: Number(item.quantity) || 1
       }))
     };
 
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error ?? "No se pudo procesar el pedido");
       }
-
       clear();
       setSuccess(true);
-      router.refresh();
     } catch (err: any) {
       setError(err.message ?? "Ocurrió un error inesperado");
     } finally {
@@ -68,12 +62,24 @@ export default function CheckoutPage() {
 
   if (success) {
     return (
-      <div className="container-page py-12 md:py-16">
-        <h1 className="heading-section mb-2">Pedido confirmado</h1>
-        <p className="text-muted text-sm mb-4 max-w-md">
-          Hemos recibido tu orden correctamente. En breve recibirás un correo con
-          el detalle y los siguientes pasos.
-        </p>
+      <div className="container-page py-12 md:py-16 max-w-2xl">
+        <div className="glass-surface rounded-2xl p-8 md:p-10 border-gold/20 text-center">
+          <div className="inline-flex h-14 w-14 rounded-full bg-gold/15 text-gold items-center justify-center mb-6">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="heading-section mb-3">¡Gracias por tu confianza!</h1>
+          <p className="text-sm text-foreground mb-3">
+            Tu pedido está confirmado. En Gold Legacy cada detalle cuenta: revisamos cada pieza, tu dirección y tus datos para que todo llegue perfecto.
+          </p>
+          <p className="text-muted text-sm mb-4">
+            En breve recibirás un correo con el resumen de tu compra y los siguientes pasos. Si tienes cualquier duda, escríbenos.
+          </p>
+          <Link href="/catalogo" className="btn-outline inline-block text-sm">
+            Seguir explorando
+          </Link>
+        </div>
       </div>
     );
   }
@@ -96,7 +102,7 @@ export default function CheckoutPage() {
               <input
                 name="name"
                 required
-                className="w-full rounded-full bg-black/40 border border-white/10 px-4 py-2 text-sm outline-none focus:border-gold/80"
+                className="w-full rounded-full input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 text-foreground"
               />
             </div>
             <div>
@@ -107,7 +113,7 @@ export default function CheckoutPage() {
                 type="email"
                 name="email"
                 required
-                className="w-full rounded-full bg-black/40 border border-white/10 px-4 py-2 text-sm outline-none focus:border-gold/80"
+                className="w-full rounded-full input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 text-foreground"
               />
             </div>
           </div>
@@ -118,7 +124,7 @@ export default function CheckoutPage() {
               </label>
               <input
                 name="phone"
-                className="w-full rounded-full bg-black/40 border border-white/10 px-4 py-2 text-sm outline-none focus:border-gold/80"
+                className="w-full rounded-full input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 text-foreground"
               />
             </div>
             <div>
@@ -128,7 +134,7 @@ export default function CheckoutPage() {
               <input
                 name="city"
                 required
-                className="w-full rounded-full bg-black/40 border border-white/10 px-4 py-2 text-sm outline-none focus:border-gold/80"
+                className="w-full rounded-full input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 text-foreground"
               />
             </div>
           </div>
@@ -140,7 +146,7 @@ export default function CheckoutPage() {
               name="address"
               required
               rows={3}
-              className="w-full rounded-2xl bg-black/40 border border-white/10 px-4 py-2 text-sm outline-none focus:border-gold/80 resize-none"
+              className="w-full rounded-2xl input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 resize-none text-foreground"
             />
           </div>
 
@@ -175,19 +181,19 @@ export default function CheckoutPage() {
                   {item.name}
                 </p>
                 <p className="text-muted">
-                  {item.quantity} x {item.price.toFixed(2)} USD
+                  {item.quantity} x {formatPriceCOP(item.price)}
                 </p>
               </div>
               <p className="text-gold font-semibold">
-                {(item.price * item.quantity).toFixed(2)} USD
+                {formatPriceCOP(item.price * item.quantity)}
               </p>
             </div>
           ))}
         </div>
-        <div className="border-t border-white/10 pt-3 flex items-center justify-between">
+        <div className="border-t border-border pt-3 flex items-center justify-between">
           <span className="text-muted text-xs">Total estimado</span>
           <span className="text-gold font-semibold">
-            {total.toFixed(2)} USD
+            {formatPriceCOP(total)}
           </span>
         </div>
       </aside>

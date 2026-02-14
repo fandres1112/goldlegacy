@@ -2,6 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
+import { WishlistButton } from "@/components/shop/WishlistButton";
+import { formatPriceCOP } from "@/lib/formatPrice";
 
 type ProductPageProps = {
   params: {
@@ -65,10 +67,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className="space-y-6 max-w-md">
           <div className="space-y-3 animate-in">
-            <p className="text-[11px] uppercase tracking-[0.25em] text-gold-light">
-              {product.category?.name ?? "Colección Gold Legacy"}
-            </p>
-            <h1 className="heading-section text-3xl md:text-4xl">{product.name}</h1>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.25em] text-gold-light">
+                  {product.category?.name ?? "Colección Gold Legacy"}
+                </p>
+                <h1 className="heading-section text-3xl md:text-4xl">{product.name}</h1>
+              </div>
+              <WishlistButton productId={product.id} />
+            </div>
             <p className="text-base text-muted leading-relaxed">
               {product.description}
             </p>
@@ -78,13 +85,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="flex items-baseline justify-between">
               <p className="text-[13px] text-gray-400 uppercase tracking-[0.1em]">Precio</p>
               <p className="text-3xl font-semibold text-gold">
-                {product.price.toString()} USD
+                {formatPriceCOP(Number(product.price))}
               </p>
             </div>
-            <div className="border-t border-white/10 pt-3 space-y-2 text-sm">
+            <div className="border-t border-border pt-3 space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Material</span>
-                <span className="text-white">{product.material}</span>
+                <span className="text-foreground">{product.material}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Disponibilidad</span>
@@ -110,8 +117,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           )}
 
-          <div className="glass-surface rounded-2xl p-5 border-white/5 space-y-3 text-xs text-muted">
-            <p className="text-white text-sm font-medium mb-2">Detalles de la pieza</p>
+          <div className="glass-surface rounded-2xl p-5 border-border space-y-3 text-xs text-muted">
+            <p className="text-foreground text-sm font-medium mb-2">Detalles de la pieza</p>
             <p>
               Cada pieza Gold Legacy es inspeccionada individualmente antes de ser enviada,
               asegurando consistencia en brillo, acabado y proporciones.
