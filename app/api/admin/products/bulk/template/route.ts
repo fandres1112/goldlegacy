@@ -20,8 +20,8 @@ export async function GET() {
 
   const workbook = new ExcelJS.Workbook();
 
-  workbook.addWorksheet("Productos", { visibility: "visible" });
-  const opcionesSheet = workbook.addWorksheet("Opciones", { visibility: "visible" });
+  workbook.addWorksheet("Productos");
+  const opcionesSheet = workbook.addWorksheet("Opciones");
   opcionesSheet.getCell("A1").value = "Tipo (columna tipo en Productos)";
   TIPOS_ES.forEach((t, i) => {
     opcionesSheet.getCell(`A${i + 2}`).value = t;
