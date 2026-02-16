@@ -192,14 +192,6 @@ export function Header() {
                           <User className="h-4 w-4 text-foreground-muted shrink-0" />
                           Iniciar sesión
                         </Link>
-                        <Link
-                          href="/registro"
-                          onClick={() => setAccountOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-[13px] text-gold/90 hover:text-gold hover:bg-gold/5 transition-colors"
-                        >
-                          <User className="h-4 w-4 text-gold/50 shrink-0" />
-                          Crear cuenta
-                        </Link>
                       </div>
                     ) : (
                       <div className="px-4 py-4 text-center text-[13px] text-foreground-muted">
