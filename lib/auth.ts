@@ -22,7 +22,7 @@ export function signJwt(payload: JwtPayload, expiresIn: string = "7d") {
     throw new Error("JWT_SECRET no configurado");
   }
 
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn } as jwt.SignOptions);
 }
 
 export function verifyJwt(token: string): JwtPayload | null {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -15,7 +15,7 @@ const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
   no_email: "Tu cuenta de Google no comparte el email."
 };
 
-export default function IniciarSesionPage() {
+function IniciarSesionForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -147,5 +147,18 @@ export default function IniciarSesionPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function IniciarSesionPage() {
+  return (
+    <Suspense fallback={
+      <div className="container-page py-12 md:py-16">
+        <SectionTitle eyebrow="Cuenta" title="Iniciar sesión" description="Accede a tu cuenta." />
+        <div className="max-w-md mx-auto mt-10 h-64 rounded-2xl border border-border bg-background/50 animate-pulse" />
+      </div>
+    }>
+      <IniciarSesionForm />
+    </Suspense>
   );
 }
