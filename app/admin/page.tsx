@@ -211,9 +211,9 @@ export default function AdminPage() {
             />
           </div>
 
-          <div className="glass-surface rounded-2xl p-5 md:p-6 border-white/10 mb-10">
+          <div className="glass-surface rounded-2xl p-5 md:p-6 border-border mb-10">
             <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-              <h2 className="text-base font-semibold text-white">
+              <h2 className="text-base font-semibold text-foreground">
                 Órdenes
               </h2>
               <div className="flex items-center gap-3">
@@ -247,7 +247,7 @@ export default function AdminPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm min-w-[480px]">
                     <thead>
-                      <tr className="text-muted text-xs uppercase tracking-wider border-b border-white/10">
+                      <tr className="text-muted text-xs uppercase tracking-wider border-b border-border">
                         <th className="text-left py-2.5 font-medium">Cliente</th>
                         <th className="text-left py-2.5 font-medium">Fecha</th>
                         <th className="text-left py-2.5 font-medium">Estado</th>
@@ -259,10 +259,10 @@ export default function AdminPage() {
                       {orders.map((order) => (
                         <tr
                           key={order.id}
-                          className="border-b border-white/5 hover:bg-white/[0.03]"
+                          className="border-b border-border hover:bg-foreground/[0.03]"
                         >
                           <td className="py-2.5">
-                            <span className="text-white/95 font-medium">{order.customerName}</span>
+                            <span className="text-foreground font-medium">{order.customerName}</span>
                             {order.customerEmail && (
                               <span className="block text-xs text-muted truncate max-w-[140px]" title={order.customerEmail}>
                                 {order.customerEmail}
@@ -316,7 +316,7 @@ export default function AdminPage() {
                   </table>
                 </div>
                 {ordersTotal > ORDERS_PAGE_SIZE && orders.length > 0 && (
-                  <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-white/10">
+                  <div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-border">
                     <p className="text-xs text-muted">
                       Mostrando {(ordersPage - 1) * ORDERS_PAGE_SIZE + 1}–{Math.min(ordersPage * ORDERS_PAGE_SIZE, ordersTotal)} de {ordersTotal}
                     </p>
@@ -352,8 +352,8 @@ export default function AdminPage() {
           (summary.productsByCategory?.length ?? 0) > 0 ? (
             <div className="admin-charts grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
               {summary.ordersOverTime && summary.ordersOverTime.length > 0 && (
-                <div className="glass-surface rounded-2xl p-5 border-white/10">
-                  <h2 className="text-sm font-semibold text-white mb-4">
+                <div className="glass-surface rounded-2xl p-5 border-border">
+                  <h2 className="text-sm font-semibold text-foreground mb-4">
                     Órdenes e ingresos (últimos 14 días)
                   </h2>
                   <AreaChart
@@ -368,8 +368,8 @@ export default function AdminPage() {
                 </div>
               )}
               {summary.ordersByStatus && summary.ordersByStatus.length > 0 && (
-                <div className="glass-surface rounded-2xl p-5 border-white/10">
-                  <h2 className="text-sm font-semibold text-white mb-4">
+                <div className="glass-surface rounded-2xl p-5 border-border">
+                  <h2 className="text-sm font-semibold text-foreground mb-4">
                     Órdenes por estado
                   </h2>
                   <DonutChart
@@ -383,8 +383,8 @@ export default function AdminPage() {
                 </div>
               )}
               {summary.productsByCategory && summary.productsByCategory.length > 0 && (
-                <div className="glass-surface rounded-2xl p-5 border-white/10 lg:col-span-2">
-                  <h2 className="text-sm font-semibold text-white mb-4">
+                <div className="glass-surface rounded-2xl p-5 border-border lg:col-span-2">
+                  <h2 className="text-sm font-semibold text-foreground mb-4">
                     Productos por categoría
                   </h2>
                   <BarChart
@@ -418,13 +418,13 @@ function AdminStat({
   value: string | number;
 }) {
   return (
-    <div className="glass-surface rounded-2xl p-5 md:p-6 border-white/10 flex items-start gap-4">
+    <div className="glass-surface rounded-2xl p-5 md:p-6 border-border flex items-start gap-4">
       <div className="rounded-xl bg-gold/10 text-gold p-2.5 shrink-0">
         {icon}
       </div>
       <div>
         <p className="text-sm text-muted mb-1">{label}</p>
-        <p className="text-xl md:text-2xl font-semibold text-white">
+        <p className="text-xl md:text-2xl font-semibold text-foreground">
           {value}
         </p>
       </div>

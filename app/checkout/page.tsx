@@ -4,6 +4,7 @@ import { FormEvent, useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartContext";
 import { formatPriceCOP } from "@/lib/formatPrice";
+import { formatOrderNumber } from "@/lib/formatOrderNumber";
 
 type UserMe = {
   id: string;
@@ -35,6 +36,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [orderId, setOrderId] = useState<string | null>(null);
 
   const [user, setUser] = useState<UserMe | null>(null);
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
@@ -144,6 +146,7 @@ export default function CheckoutPage() {
       if (!res.ok) {
         throw new Error(data.error ?? "No se pudo procesar el pedido");
       }
+      setOrderId(data.id ?? null);
       if (user && saveNewAddress) {
         try {
           await fetch("/api/user/addresses", {
@@ -181,11 +184,16 @@ export default function CheckoutPage() {
             </svg>
           </div>
           <h1 className="heading-section mb-3">¡Gracias por tu confianza!</h1>
+          {orderId && (
+            <p className="text-gold font-semibold text-sm mb-2">
+              Tu orden: {formatOrderNumber(orderId)}
+            </p>
+          )}
           <p className="text-sm text-foreground mb-3">
             Tu pedido está confirmado. En Gold Legacy cada detalle cuenta: revisamos cada pieza, tu dirección y tus datos para que todo llegue perfecto.
           </p>
           <p className="text-muted text-sm mb-4">
-            En breve recibirás un correo con el resumen de tu compra y los siguientes pasos. Si tienes cualquier duda, escríbenos.
+            En breve recibirás un correo con el resumen de tu compra y los siguientes pasos. Si tienes cualquier duda, indica tu número de orden al contactarnos.
           </p>
           <Link href="/catalogo" className="btn-outline inline-block text-sm">
             Seguir explorando
@@ -226,7 +234,7 @@ export default function CheckoutPage() {
                       className="mt-1 text-gold focus:ring-gold"
                     />
                     <div className="text-sm">
-                      <span className="text-white font-medium">
+                      <span className="text-foreground font-medium">
                         {addr.label || addr.shippingCity}
                       </span>
                       <p className="text-muted text-xs mt-0.5">
@@ -244,7 +252,7 @@ export default function CheckoutPage() {
                     onChange={() => setSelectedAddressId("new")}
                     className="text-gold focus:ring-gold"
                   />
-                  <span className="text-sm text-white">Nueva dirección</span>
+                  <span className="text-sm text-foreground">Nueva dirección</span>
                 </label>
               </div>
             </div>

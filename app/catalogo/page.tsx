@@ -11,6 +11,12 @@ type CatalogPageProps = {
 
 export const revalidate = 60;
 
+export const metadata = {
+  title: "Catálogo · Gold Legacy",
+  description:
+    "Explora nuestra colección de joyería en oro: cadenas, anillos, pulseras, aretes y dijes. Diseño minimalista y atemporal."
+};
+
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const page = Number(searchParams.page ?? "1");
   const pageSize = 12;

@@ -29,10 +29,19 @@ export function Footer() {
               Sobre nosotros
             </Link>
           </div>
+          <div className="space-y-1">
+            <p className="text-foreground font-medium">Legal</p>
+            <Link href="/terminos" className="block hover:text-gold-light">
+              Términos y condiciones
+            </Link>
+            <Link href="/privacidad" className="block hover:text-gold-light">
+              Política de privacidad
+            </Link>
+          </div>
         </div>
       </div>
       <div className="border-t border-border py-4">
-        <div className="container-page flex items-center justify-between text-[11px] text-foreground-muted">
+        <div className="container-page flex items-center justify-between text-[11px] text-foreground-muted flex-wrap gap-2">
           <span>© {new Date().getFullYear()} Gold Legacy. Todos los derechos reservados.</span>
           <span>Diseñado para una experiencia de lujo minimalista.</span>
         </div>

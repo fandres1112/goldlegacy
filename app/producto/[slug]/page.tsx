@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
@@ -6,12 +7,30 @@ import { WishlistButton } from "@/components/shop/WishlistButton";
 import { formatPriceCOP } from "@/lib/formatPrice";
 
 type ProductPageProps = {
-  params: {
-    slug: string;
-  };
+  params: { slug: string };
 };
 
 export const revalidate = 60;
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const product = await prisma.product.findUnique({
+    where: { slug: params.slug },
+    select: { name: true, description: true, images: true }
+  });
+  if (!product) {
+    return { title: "Producto · Gold Legacy" };
+  }
+  const image = product.images[0];
+  return {
+    title: `${product.name} · Gold Legacy`,
+    description: product.description.slice(0, 160),
+    openGraph: {
+      title: `${product.name} · Gold Legacy`,
+      description: product.description.slice(0, 160),
+      ...(image && { images: [{ url: image, alt: product.name }] })
+    }
+  };
+}
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const product = await prisma.product.findUnique({

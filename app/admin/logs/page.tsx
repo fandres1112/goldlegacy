@@ -70,7 +70,7 @@ export default function AdminLogsPage() {
         </p>
       </div>
 
-      <div className="glass-surface rounded-2xl border border-white/5 overflow-hidden">
+      <div className="glass-surface rounded-2xl border border-border overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-muted text-sm">
             Cargando registros...
@@ -84,7 +84,7 @@ export default function AdminLogsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm min-w-[640px]">
                 <thead>
-                  <tr className="text-muted text-xs uppercase tracking-wider border-b border-white/10 bg-white/[0.02]">
+                  <tr className="text-muted text-xs uppercase tracking-wider border-b border-border bg-foreground/[0.02]">
                     <th className="text-left py-3 px-4 font-medium">Fecha</th>
                     <th className="text-left py-3 px-4 font-medium">Acción</th>
                     <th className="text-left py-3 px-4 font-medium">Usuario</th>
@@ -95,7 +95,7 @@ export default function AdminLogsPage() {
                   {logs.map((log) => (
                     <tr
                       key={log.id}
-                      className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
+                      className="border-b border-border hover:bg-foreground/[0.02] transition-colors"
                     >
                       <td className="py-3 px-4 text-muted whitespace-nowrap">
                         {new Date(log.createdAt).toLocaleString("es", {
@@ -124,7 +124,7 @@ export default function AdminLogsPage() {
               </table>
             </div>
             {totalPages > 1 && (
-              <div className="flex items-center justify-between gap-4 px-4 py-3 border-t border-white/5 text-xs text-muted">
+              <div className="flex items-center justify-between gap-4 px-4 py-3 border-t border-border text-xs text-muted">
                 <span>
                   Mostrando {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} de {total}
                 </span>

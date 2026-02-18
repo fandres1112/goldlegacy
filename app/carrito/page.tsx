@@ -45,7 +45,7 @@ export default function CartPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <p className="text-base text-white mb-2">Tu carrito está vacío</p>
+            <p className="text-base text-foreground mb-2">Tu carrito está vacío</p>
             <p className="text-sm text-muted mb-6">
               Explora la colección y elige las piezas que mejor hablen de tu estilo.
             </p>

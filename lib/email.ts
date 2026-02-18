@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { formatPriceCOP } from "./formatPrice";
+import { formatOrderNumber } from "./formatOrderNumber";
 
 const SMTP_HOST = process.env.SMTP_HOST;
 const SMTP_PORT = Number(process.env.SMTP_PORT) || 2525;
@@ -64,7 +65,7 @@ function buildOrderConfirmationHtml(data: OrderEmailData): string {
     </table>
     <p style="margin:0 0 4px"><strong>Total:</strong> ${formatPriceCOP(data.total)}</p>
     <p style="margin:0 0 4px"><strong>Envío a:</strong> ${data.shippingAddress}, ${data.shippingCity}</p>
-    <p style="margin:16px 0 0;font-size:12px;color:#888">Orden #${data.id} · ${dateStr}</p>
+    <p style="margin:16px 0 0;font-size:12px;color:#888">Orden ${formatOrderNumber(data.id)} · ${dateStr}</p>
     <p style="margin:24px 0 0;font-size:14px;color:#666">Gracias por confiar en Gold Legacy.</p>
   </div>
 </body>
@@ -86,9 +87,9 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
     await transport.sendMail({
       from: MAIL_FROM,
       to: data.customerEmail,
-      subject: `Gold Legacy – Confirmación de orden #${data.id}`,
+      subject: `Gold Legacy – Confirmación de orden ${formatOrderNumber(data.id)}`,
       html: buildOrderConfirmationHtml(data),
-      text: `Gold Legacy – Hola ${data.customerName}, recibimos tu pedido. Total: ${formatPriceCOP(data.total)}. Envío a: ${data.shippingAddress}, ${data.shippingCity}. Orden #${data.id}.`
+      text: `Gold Legacy – Hola ${data.customerName}, recibimos tu pedido. Total: ${formatPriceCOP(data.total)}. Envío a: ${data.shippingAddress}, ${data.shippingCity}. Orden ${formatOrderNumber(data.id)}.`
     });
   } catch (err) {
     console.error("[email] Error al enviar confirmación de orden:", err);

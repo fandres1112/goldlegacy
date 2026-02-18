@@ -239,34 +239,37 @@ a:hover {
   animation: float 5s ease-in-out infinite;
 }
 
-/* Gráficos Tremor/Recharts en panel admin: texto y colores visibles sobre fondo oscuro */
+/* Gráficos Tremor/Recharts: texto y ejes visibles en ambos temas */
+.admin-charts {
+  color: var(--color-foreground);
+}
 .admin-charts .recharts-text,
 .admin-charts .recharts-cartesian-axis-tick text,
 .admin-charts .recharts-legend-item-text,
-.admin-charts tspan {
-  fill: rgba(229, 231, 235, 0.95) !important;
+.admin-charts .recharts-tooltip-item-text,
+.admin-charts tspan,
+.admin-charts [class*="tremor-Legend"],
+.admin-charts [class*="tremor-"] text,
+.admin-charts [class*="tremor-"] span,
+.admin-charts svg text {
+  fill: var(--color-foreground) !important;
+  color: var(--color-foreground) !important;
 }
 
 .admin-charts .recharts-legend-item,
-.admin-charts [class*="tremor"] {
-  color: rgba(229, 231, 235, 0.95);
-}
-
 .admin-charts .recharts-default-legend .recharts-legend-item text {
-  fill: rgba(229, 231, 235, 0.95) !important;
+  fill: var(--color-foreground) !important;
+  color: var(--color-foreground) !important;
 }
 
-[data-theme="light"] .admin-charts .recharts-text,
-[data-theme="light"] .admin-charts .recharts-cartesian-axis-tick text,
-[data-theme="light"] .admin-charts .recharts-legend-item-text,
-[data-theme="light"] .admin-charts tspan,
-[data-theme="light"] .admin-charts .recharts-legend-item,
-[data-theme="light"] .admin-charts [class*="tremor"] {
-  fill: #1A1814 !important;
-  color: #1A1814 !important;
+/* Tooltip y etiquetas secundarias */
+.admin-charts .recharts-tooltip-wrapper,
+.admin-charts .recharts-default-tooltip {
+  color: var(--color-foreground) !important;
 }
-[data-theme="light"] .admin-charts .recharts-default-legend .recharts-legend-item text {
-  fill: #1A1814 !important;
+.admin-charts .recharts-tooltip-wrapper label,
+.admin-charts .recharts-default-tooltip label {
+  color: var(--color-foreground) !important;
 }
 
 /* Colores de las series (barras, áreas, líneas, donut) para que se vean en fondo oscuro */
