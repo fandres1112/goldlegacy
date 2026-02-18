@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderTree, Package, Users } from "lucide-react";
+import { LayoutDashboard, FolderTree, Package, Users, ScrollText } from "lucide-react";
 
 type AdminUser = {
   id: string;
@@ -16,7 +16,8 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/users", label: "Usuarios", icon: Users },
   { href: "/admin/categories", label: "Categorías", icon: FolderTree },
-  { href: "/admin/products", label: "Productos", icon: Package }
+  { href: "/admin/products", label: "Productos", icon: Package },
+  { href: "/admin/logs", label: "Registro de actividad", icon: ScrollText }
 ];
 
 export default function AdminLayout({

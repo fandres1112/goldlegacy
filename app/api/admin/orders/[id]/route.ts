@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 import { z } from "zod";
 import { OrderStatus } from "@prisma/client";
 
@@ -12,8 +13,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let admin: Awaited<ReturnType<typeof requireAdmin>>;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch {
     return NextResponse.json(
       { error: "No autorizado" },
@@ -36,6 +38,14 @@ export async function PATCH(
     const order = await prisma.order.update({
       where: { id },
       data: { status: status as OrderStatus }
+    });
+
+    await createAuditLog({
+      action: "ORDER_STATUS_UPDATE",
+      userId: admin.id,
+      entity: "order",
+      entityId: order.id,
+      details: { orderId: order.id, status: order.status }
     });
 
     return NextResponse.json(order);

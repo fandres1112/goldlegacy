@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { ProductType } from "@prisma/client";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 
 const productUpdateSchema = z.object({
   name: z.string().min(2).optional(),
@@ -39,7 +40,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
     const json = await req.json();
     const data = productUpdateSchema.parse(json);
 
@@ -57,6 +58,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const updated = await prisma.product.update({
       where: { id: existing.id },
       data
+    });
+
+    await createAuditLog({
+      action: "PRODUCT_UPDATE",
+      userId: admin.id,
+      entity: "product",
+      entityId: existing.id,
+      details: { slug: params.slug, name: updated.name }
     });
 
     return NextResponse.json(updated);
@@ -80,7 +89,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     const existing = await prisma.product.findUnique({
       where: { slug: params.slug }
@@ -95,6 +104,14 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
     await prisma.product.delete({
       where: { id: existing.id }
+    });
+
+    await createAuditLog({
+      action: "PRODUCT_DELETE",
+      userId: admin.id,
+      entity: "product",
+      entityId: existing.id,
+      details: { name: existing.name, slug: existing.slug }
     });
 
     return NextResponse.json({ ok: true });

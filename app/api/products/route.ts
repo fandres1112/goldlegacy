@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ProductType } from "@prisma/client";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 
 const productCreateSchema = z.object({
   name: z.string().min(2),
@@ -101,13 +102,21 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     const json = await req.json();
     const data = productCreateSchema.parse(json);
 
     const product = await prisma.product.create({
       data
+    });
+
+    await createAuditLog({
+      action: "PRODUCT_CREATE",
+      userId: admin.id,
+      entity: "product",
+      entityId: product.id,
+      details: { name: product.name, slug: product.slug }
     });
 
     return NextResponse.json(product, { status: 201 });

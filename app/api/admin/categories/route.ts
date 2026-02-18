@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -28,8 +29,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  let admin: Awaited<ReturnType<typeof requireAdmin>>;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -58,6 +60,15 @@ export async function POST(req: NextRequest) {
         isActive: parsed.data.isActive ?? true
       }
     });
+
+    await createAuditLog({
+      action: "CATEGORY_CREATE",
+      userId: admin.id,
+      entity: "category",
+      entityId: category.id,
+      details: { name: category.name, slug: category.slug }
+    });
+
     return NextResponse.json(category);
   } catch (error) {
     console.error(error);

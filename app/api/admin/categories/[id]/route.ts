@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -13,8 +14,9 @@ export async function PATCH(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let admin: Awaited<ReturnType<typeof requireAdmin>>;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -51,6 +53,15 @@ export async function PATCH(
         ...(parsed.data.isActive != null && { isActive: parsed.data.isActive })
       }
     });
+
+    await createAuditLog({
+      action: "CATEGORY_UPDATE",
+      userId: admin.id,
+      entity: "category",
+      entityId: category.id,
+      details: { name: category.name, slug: category.slug }
+    });
+
     return NextResponse.json(category);
   } catch (error) {
     console.error(error);

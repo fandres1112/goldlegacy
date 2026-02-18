@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -54,6 +55,14 @@ export async function POST(req: NextRequest) {
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7 // 7 días
+    });
+
+    await createAuditLog({
+      action: "LOGIN",
+      userId: user.id,
+      entity: "user",
+      entityId: user.id,
+      details: { email: user.email }
     });
 
     return response;

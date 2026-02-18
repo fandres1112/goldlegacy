@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { createAuditLog } from "@/lib/auditLog";
 import { ProductType } from "@prisma/client";
 
 const VALID_TYPES = new Set<string>(["CHAIN", "RING", "BRACELET", "EARRING", "PENDANT"]);
@@ -40,8 +41,9 @@ function getNum(row: Record<string, unknown>, key: string): number | null {
 }
 
 export async function POST(req: NextRequest) {
+  let admin: Awaited<ReturnType<typeof requireAdmin>>;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
@@ -195,6 +197,13 @@ export async function POST(req: NextRequest) {
       });
     }
   }
+
+  await createAuditLog({
+    action: "PRODUCT_BULK",
+    userId: admin.id,
+    entity: "product",
+    details: { created, total: rows.length, errorsCount: errors.length }
+  });
 
   return NextResponse.json({ created, total: rows.length, errors });
 }
