@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { Prisma } from "@prisma/client";
 
 export type AuditPayload = {
   action: string;
@@ -16,7 +17,7 @@ export async function createAuditLog(payload: AuditPayload) {
         userId: payload.userId ?? undefined,
         entity: payload.entity ?? undefined,
         entityId: payload.entityId ?? undefined,
-        details: payload.details ?? undefined
+        details: payload.details ? (payload.details as Prisma.InputJsonValue) : undefined
       }
     });
   } catch (err) {
