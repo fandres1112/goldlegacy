@@ -45,6 +45,14 @@ export default function CheckoutPage() {
   const [saveNewAddress, setSaveNewAddress] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
+  const [mpEnabled, setMpEnabled] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/payments/mercadopago/status")
+      .then((r) => r.json())
+      .then((data) => setMpEnabled(Boolean(data?.enabled)))
+      .catch(() => setMpEnabled(false));
+  }, []);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -137,6 +145,42 @@ export default function CheckoutPage() {
     };
 
     try {
+      if (mpEnabled) {
+        const res = await fetch("/api/payments/mercadopago/preference", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "No se pudo preparar el pago");
+        }
+        if (user && saveNewAddress) {
+          try {
+            await fetch("/api/user/addresses", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                fullName: payload.customerName,
+                email: payload.customerEmail,
+                phone: payload.customerPhone,
+                shippingAddress: payload.shippingAddress,
+                shippingCity: payload.shippingCity
+              })
+            });
+          } catch {
+            // No bloquear
+          }
+        }
+        clear();
+        if (data.init_point) {
+          window.location.href = data.init_point;
+          return;
+        }
+        throw new Error("No se obtuvo el enlace de pago");
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -347,7 +391,13 @@ export default function CheckoutPage() {
             disabled={loading}
             className="btn-primary mt-2"
           >
-            {loading ? "Procesando pedido..." : "Confirmar pedido"}
+            {loading
+              ? mpEnabled
+                ? "Redirigiendo a Mercado Pago..."
+                : "Procesando pedido..."
+              : mpEnabled
+                ? "Ir a pagar con Mercado Pago"
+                : "Confirmar pedido"}
           </button>
         </form>
       </div>
