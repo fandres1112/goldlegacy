@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
 import { createPreference, getBaseUrl, isMercadoPagoConfigured } from "@/lib/mercadopago";
+import { getMpPaymentsEnabled } from "@/lib/settings";
 import { z } from "zod";
 
 const orderItemSchema = z.object({
@@ -23,7 +24,8 @@ const orderCreateSchema = z.object({
  * Devuelve init_point para redirigir al usuario al checkout de MP.
  */
 export async function POST(req: NextRequest) {
-  if (!isMercadoPagoConfigured()) {
+  const enabled = isMercadoPagoConfigured() && (await getMpPaymentsEnabled());
+  if (!enabled) {
     return NextResponse.json(
       { error: "Pagos con Mercado Pago no están configurados" },
       { status: 503 }

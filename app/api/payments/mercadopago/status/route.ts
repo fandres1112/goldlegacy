@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { isMercadoPagoConfigured } from "@/lib/mercadopago";
+import { getMpPaymentsEnabled } from "@/lib/settings";
 
 export async function GET() {
-  return NextResponse.json({ enabled: isMercadoPagoConfigured() });
+  const enabled = isMercadoPagoConfigured() && (await getMpPaymentsEnabled());
+  return NextResponse.json({ enabled });
 }
+

@@ -129,4 +129,13 @@ model AuditLog {
   userId String?
 }
 
+/// Configuración simple de la aplicación (pares clave/valor).
+model Setting {
+  key        String   @id
+  boolValue  Boolean?
+  stringValue String?
+  updatedAt  DateTime @updatedAt @default(now())
+}
+
+
 
