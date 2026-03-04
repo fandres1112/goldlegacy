@@ -145,6 +145,21 @@ model AuditLog {
   userId String?
 }
 
+/// Departamentos de Colombia (para direcciones de envío).
+model Department {
+  id   String @id @default(cuid())
+  name String
+  cities City[]
+}
+
+/// Ciudades/municipios de Colombia (para autocompletado de envío).
+model City {
+  id           String   @id @default(cuid())
+  name         String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+}
+
 /// Configuración simple de la aplicación (pares clave/valor).
 model Setting {
   key        String   @id

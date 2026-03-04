@@ -8,8 +8,19 @@ import { OrderStatus } from "@prisma/client";
 
 const updateOrderSchema = z.object({
   status: z.enum(["PENDING", "PAID", "SHIPPED", "CANCELLED"] as const),
-  trackingNumber: z.string().max(200).optional().nullable(),
-  trackingUrl: z.string().url().max(500).optional().nullable()
+  trackingNumber: z
+    .string()
+    .max(200)
+    .optional()
+    .nullable()
+    .transform((s) => (s != null && String(s).trim() ? String(s).trim() : null)),
+  trackingUrl: z
+    .string()
+    .max(500)
+    .optional()
+    .nullable()
+    .transform((s) => (s != null && String(s).trim() ? String(s).trim() : null))
+    .refine((s) => s === null || /^https?:\/\/[^\s]+$/i.test(s), "URL de seguimiento no válida")
 });
 
 export async function PATCH(

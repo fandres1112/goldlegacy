@@ -12,6 +12,8 @@ type OrderItem = {
   status: string;
   createdAt: string;
   customerName: string;
+  trackingNumber?: string | null;
+  trackingUrl?: string | null;
   items: Array<{
     id: string;
     quantity: number;
@@ -126,6 +128,24 @@ export default function MisOrdenesPage() {
                   </li>
                 ))}
               </ul>
+              {order.status === "SHIPPED" && (order.trackingNumber || order.trackingUrl) && (
+                <div className="mb-3 p-3 rounded-lg bg-foreground/5 border border-border text-sm">
+                  <p className="text-foreground-muted text-xs uppercase tracking-wider mb-1">Seguimiento</p>
+                  {order.trackingNumber && (
+                    <p className="text-foreground">Guía: <strong>{order.trackingNumber}</strong></p>
+                  )}
+                  {order.trackingUrl && (
+                    <a
+                      href={order.trackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gold hover:text-gold-light underline"
+                    >
+                      Rastrear envío
+                    </a>
+                  )}
+                </div>
+              )}
               <p className="text-gold font-semibold">
                 Total: {formatPriceCOP(Number(order.total))}
               </p>

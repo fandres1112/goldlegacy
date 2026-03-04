@@ -1,7 +1,18 @@
 const { PrismaClient, ProductType, UserRole } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const path = require("path");
+const fs = require("fs");
 
 const prisma = new PrismaClient();
+
+let DEPARTMENTS_AND_CITIES;
+try {
+  const jsonPath = path.join(__dirname, "colombia.json");
+  DEPARTMENTS_AND_CITIES = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+} catch (e) {
+  console.error("No se pudo cargar prisma/colombia.json. Ejecuta el script de descarga o crea el archivo.");
+  throw e;
+}
 
 async function main() {
   const passwordHash = await bcrypt.hash("admin1234", 10);
@@ -113,6 +124,24 @@ async function main() {
   });
 
   console.log("Productos seed creados/actualizados.");
+
+  const deptCount = await prisma.department.count();
+  if (deptCount === 0) {
+    let totalCities = 0;
+    for (const { departamento: deptName, ciudades: cities } of DEPARTMENTS_AND_CITIES) {
+      const dept = await prisma.department.create({
+        data: { name: deptName }
+      });
+      const toCreate = cities.filter((c) => c && String(c).trim());
+      if (toCreate.length > 0) {
+        await prisma.city.createMany({
+          data: toCreate.map((name) => ({ name: name.trim(), departmentId: dept.id }))
+        });
+        totalCities += toCreate.length;
+      }
+    }
+    console.log("Departamentos y ciudades de Colombia creados:", totalCities, "ciudades.");
+  }
 }
 
 main()

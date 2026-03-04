@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Package, ShoppingCart, Users, DollarSign, FileDown } from "lucide-react";
 import { AreaChart, BarChart, DonutChart } from "@tremor/react";
 import { formatPriceCOP } from "@/lib/formatPrice";
+import { toast } from "@/components/ui/Toast";
 
 type AdminUser = {
   id: string;
@@ -230,8 +231,22 @@ export default function AdminPage() {
         credentials: "include",
         body: JSON.stringify(body)
       });
-      if (!res.ok) throw new Error("Error al actualizar");
-      const updated = await res.json();
+      const text = await res.text();
+      if (!res.ok) {
+        let msg = "Error al actualizar";
+        if (text.trim()) {
+          try {
+            const data = JSON.parse(text);
+            if (data?.error) msg = data.error;
+            if (data?.detail) msg += ": " + data.detail;
+          } catch {
+            /* ignore */
+          }
+        }
+        toast(msg, "error");
+        return;
+      }
+      const updated = text.trim() ? JSON.parse(text) : {};
       setAllOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: updated.status, trackingNumber: updated.trackingNumber ?? null, trackingUrl: updated.trackingUrl ?? null } : o))
       );
@@ -292,8 +307,20 @@ export default function AdminPage() {
         credentials: "include",
         body: JSON.stringify({ orderIds: ids, status: newStatus })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error al actualizar");
+      const text = await res.text();
+      if (!res.ok) {
+        let msg = "Error al actualizar";
+        if (text.trim()) {
+          try {
+            const data = JSON.parse(text);
+            if (data?.error) msg = data.error;
+          } catch {
+            /* ignore */
+          }
+        }
+        toast(msg, "error");
+        return;
+      }
       setAllOrders((prev) =>
         prev.map((o) => (ids.includes(o.id) ? { ...o, status: newStatus } : o))
       );
@@ -570,7 +597,7 @@ export default function AdminPage() {
                                   </option>
                                 ))}
                               </select>
-                              {order.status === "SHIPPED" && (
+                              {(order.status === "PAID" || order.status === "SHIPPED") && (
                                 <>
                                   <input
                                     type="text"
@@ -578,6 +605,7 @@ export default function AdminPage() {
                                     value={order.trackingNumber ?? ""}
                                     onChange={(e) => updateOrderTracking(order.id, "trackingNumber", e.target.value)}
                                     className="block w-full input-theme border rounded-lg px-2 py-1 text-xs text-foreground focus:border-gold/60 outline-none"
+                                    title={order.status === "PAID" ? "Completa antes de marcar como Enviado; se incluirá en el correo al cliente" : undefined}
                                   />
                                   <input
                                     type="url"
@@ -585,15 +613,21 @@ export default function AdminPage() {
                                     value={order.trackingUrl ?? ""}
                                     onChange={(e) => updateOrderTracking(order.id, "trackingUrl", e.target.value)}
                                     className="block w-full input-theme border rounded-lg px-2 py-1 text-xs text-foreground focus:border-gold/60 outline-none"
+                                    title={order.status === "PAID" ? "Completa antes de marcar como Enviado; se incluirá en el correo al cliente" : undefined}
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOrderStatusChange(order.id, "SHIPPED", order.trackingNumber, order.trackingUrl)}
-                                    disabled={updatingOrderId === order.id}
-                                    className="text-[10px] text-gold hover:text-gold-light disabled:opacity-50"
-                                  >
-                                    Guardar guía
-                                  </button>
+                                  {order.status === "PAID" && (
+                                    <p className="text-[10px] text-muted">Opcional: se enviará en el correo al marcar Enviado</p>
+                                  )}
+                                  {order.status === "SHIPPED" && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOrderStatusChange(order.id, "SHIPPED", order.trackingNumber, order.trackingUrl)}
+                                      disabled={updatingOrderId === order.id}
+                                      className="text-[10px] text-gold hover:text-gold-light disabled:opacity-50"
+                                    >
+                                      Guardar guía
+                                    </button>
+                                  )}
                                 </>
                               )}
                             </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCart } from "@/components/cart/CartContext";
 import { formatPriceCOP } from "@/lib/formatPrice";
 import { formatOrderNumber } from "@/lib/formatOrderNumber";
+import { CityAutocomplete } from "@/components/ui/CityAutocomplete";
 
 type UserMe = {
   id: string;
@@ -345,11 +346,12 @@ export default function CheckoutPage() {
               <label className="block text-xs text-muted mb-1">
                 Ciudad
               </label>
-              <input
+              <CityAutocomplete
                 name="city"
                 required
                 value={form.city}
-                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                onChange={(city) => setForm((f) => ({ ...f, city }))}
+                placeholder="Ej. Bogotá D.C., Medellín..."
                 className="w-full rounded-full input-theme border px-4 py-2 text-sm outline-none focus:border-gold/80 text-foreground"
               />
             </div>

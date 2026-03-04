@@ -113,6 +113,8 @@ async function main() {
   });
 
   console.log("Productos seed creados/actualizados.");
+
+  // Departamentos y ciudades se cargan con seed.cjs (npm run prisma:seed)
 }
 
 main()
