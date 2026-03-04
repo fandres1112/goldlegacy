@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signJwt } from "@/lib/auth";
 import { createAuditLog } from "@/lib/auditLog";
+import { checkRateLimit } from "@/lib/rateLimit";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
@@ -11,6 +12,14 @@ const loginSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const limit = checkRateLimit(req);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Demasiados intentos. Espera un momento e intenta de nuevo." },
+      { status: 429, headers: limit.retryAfter ? { "Retry-After": String(limit.retryAfter) } : undefined }
+    );
+  }
+
   try {
     const json = await req.json();
     const { email, password } = loginSchema.parse(json);

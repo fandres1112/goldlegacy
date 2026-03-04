@@ -108,12 +108,14 @@ export async function GET() {
       productsByCategory: productsByCategoryChart
     });
   } catch (error) {
-    console.error(error);
+    console.error("[admin/summary]", error);
     if (error instanceof Error && error.message === "UNAUTHORIZED") {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+    const message = error instanceof Error ? error.message : "Error al obtener resumen admin";
+    const isDev = process.env.NODE_ENV === "development";
     return NextResponse.json(
-      { error: "Error al obtener resumen admin" },
+      { error: "Error al obtener resumen admin", detail: isDev ? message : undefined },
       { status: 500 }
     );
   }

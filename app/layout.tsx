@@ -6,6 +6,8 @@ import { CartProvider } from "@/components/cart/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ToastContainer } from "@/components/ui/Toast";
+import { WhatsAppFloat } from "@/components/ui/WhatsAppFloat";
+import { getWhatsappNumber } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Gold Legacy · Tradición familiar hecha joya",
@@ -13,11 +15,13 @@ export const metadata: Metadata = {
     "Gold Legacy: tradición familiar hecha joya. Joyería en oro de lujo accesible con diseño minimalista y elegancia atemporal."
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
+  const whatsappNumber = await getWhatsappNumber();
+
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -38,6 +42,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <ToastContainer />
+            <WhatsAppFloat number={whatsappNumber} />
           </div>
         </WishlistProvider>
         </CartProvider>

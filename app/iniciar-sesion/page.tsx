@@ -87,6 +87,11 @@ function IniciarSesionForm() {
               className="w-full rounded-full input-theme border px-4 py-2.5 text-sm outline-none focus:border-gold/80 text-foreground"
               placeholder="••••••••"
             />
+            <p className="mt-1.5 text-right">
+              <Link href="/olvide-mi-contrasena" className="text-xs text-gold hover:text-gold-light">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </p>
           </div>
           {error && (
             <p className="text-sm text-red-300">{error}</p>

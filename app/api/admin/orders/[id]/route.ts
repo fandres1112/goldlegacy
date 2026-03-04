@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { createAuditLog } from "@/lib/auditLog";
+import { sendOrderShippedEmail } from "@/lib/email";
 import { z } from "zod";
 import { OrderStatus } from "@prisma/client";
 
 const updateOrderSchema = z.object({
-  status: z.enum(["PENDING", "PAID", "SHIPPED", "CANCELLED"] as const)
+  status: z.enum(["PENDING", "PAID", "SHIPPED", "CANCELLED"] as const),
+  trackingNumber: z.string().max(200).optional().nullable(),
+  trackingUrl: z.string().url().max(500).optional().nullable()
 });
 
 export async function PATCH(
@@ -33,11 +36,28 @@ export async function PATCH(
 
   try {
     const json = await req.json();
-    const { status } = updateOrderSchema.parse(json);
+    const parsed = updateOrderSchema.parse(json);
+    const { status, trackingNumber, trackingUrl } = parsed;
+
+    const previous = await prisma.order.findUnique({
+      where: { id },
+      select: { status: true }
+    });
+    if (!previous) {
+      return NextResponse.json({ error: "Orden no encontrada" }, { status: 404 });
+    }
+
+    const updateData: { status: OrderStatus; trackingNumber?: string | null; trackingUrl?: string | null } = {
+      status: status as OrderStatus
+    };
+    if (status === "SHIPPED") {
+      if (parsed.trackingNumber !== undefined) updateData.trackingNumber = parsed.trackingNumber || null;
+      if (parsed.trackingUrl !== undefined) updateData.trackingUrl = parsed.trackingUrl || null;
+    }
 
     const order = await prisma.order.update({
       where: { id },
-      data: { status: status as OrderStatus }
+      data: updateData
     });
 
     await createAuditLog({
@@ -45,8 +65,19 @@ export async function PATCH(
       userId: admin.id,
       entity: "order",
       entityId: order.id,
-      details: { orderId: order.id, status: order.status }
+      details: { orderId: order.id, status: order.status, trackingNumber: order.trackingNumber ?? undefined }
     });
+
+    const isNewlyShipped = status === "SHIPPED" && previous.status !== "SHIPPED";
+    if (isNewlyShipped) {
+      await sendOrderShippedEmail({
+        orderId: order.id,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        trackingNumber: order.trackingNumber,
+        trackingUrl: order.trackingUrl
+      });
+    }
 
     return NextResponse.json(order);
   } catch (error) {

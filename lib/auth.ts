@@ -35,7 +35,7 @@ export function verifyJwt(token: string): JwtPayload | null {
 }
 
 export async function getUserFromCookie() {
-  const store = cookies();
+  const store = await cookies();
   const token = store.get("gl_token")?.value;
   if (!token) return null;
 

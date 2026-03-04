@@ -16,6 +16,9 @@ export default function AdminSettingsPage() {
   const [mpEnabled, setMpEnabled] = useState(false);
   const [loadingMp, setLoadingMp] = useState(true);
   const [savingMp, setSavingMp] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [loadingWhatsapp, setLoadingWhatsapp] = useState(true);
+  const [savingWhatsapp, setSavingWhatsapp] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,22 +40,46 @@ export default function AdminSettingsPage() {
     if (!user || user.role !== "ADMIN") return;
     const load = async () => {
       setLoadingMp(true);
+      setLoadingWhatsapp(true);
       try {
-        const res = await fetch("/api/admin/settings/payments", { credentials: "include" });
-        const data = await res.json();
-        if (res.ok) {
-          setMpEnabled(Boolean(data.enabled));
-        } else {
-          setError(data.error ?? "No se pudo cargar la configuración de pagos.");
-        }
+        const [payRes, waRes] = await Promise.all([
+          fetch("/api/admin/settings/payments", { credentials: "include" }),
+          fetch("/api/admin/settings/whatsapp", { credentials: "include" })
+        ]);
+        const payData = await payRes.json();
+        const waData = await waRes.json();
+        if (payRes.ok) setMpEnabled(Boolean(payData.enabled));
+        else setError(payData.error ?? "No se pudo cargar la configuración de pagos.");
+        if (waRes.ok) setWhatsappNumber(waData.number ?? "");
       } catch {
-        setError("No se pudo cargar la configuración de pagos.");
+        setError("No se pudo cargar la configuración.");
       } finally {
         setLoadingMp(false);
+        setLoadingWhatsapp(false);
       }
     };
     load();
   }, [user]);
+
+  const handleSaveWhatsapp = async () => {
+    setSavingWhatsapp(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/settings/whatsapp", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ number: whatsappNumber })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "No se pudo guardar.");
+      setWhatsappNumber(data.number ?? "");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error al guardar el número.");
+    } finally {
+      setSavingWhatsapp(false);
+    }
+  };
 
   const handleToggleMp = async () => {
     setSavingMp(true);
@@ -146,6 +173,41 @@ export default function AdminSettingsPage() {
           <p className="text-[11px] text-muted mt-4">
             Nota: aunque los pagos estén activados, se necesita un <strong>Access Token válido</strong> de Mercado Pago en las variables de entorno para que la pasarela funcione.
           </p>
+        </section>
+
+        <section className="glass-surface rounded-2xl border border-border p-6">
+          <h2 className="text-sm font-semibold mb-1">Botón flotante de WhatsApp</h2>
+          <p className="text-xs text-muted mb-4">
+            Número al que se abrirá el chat cuando el cliente haga clic en el botón flotante. Código de país sin + (ej. 573001234567).
+          </p>
+
+          {loadingWhatsapp ? (
+            <p className="text-xs text-muted">Cargando...</p>
+          ) : (
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                type="text"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="573001234567"
+                className="input-theme border rounded-full px-4 py-2 text-sm text-foreground placeholder:text-muted w-full max-w-[240px] focus:border-gold/60 outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleSaveWhatsapp}
+                disabled={savingWhatsapp}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs border border-gold/40 bg-gold/10 text-gold hover:bg-gold/20 transition disabled:opacity-60"
+              >
+                {savingWhatsapp ? "Guardando..." : "Guardar número"}
+              </button>
+            </div>
+          )}
+
+          {!loadingWhatsapp && (
+            <p className="text-[11px] text-muted mt-4">
+              Si dejas el campo vacío y guardas, el botón no se mostrará en la tienda.
+            </p>
+          )}
         </section>
       </div>
     </div>

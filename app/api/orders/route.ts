@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromCookie } from "@/lib/auth";
 import { sendOrderConfirmationEmail } from "@/lib/email";
+import { checkOrderRateLimit } from "@/lib/rateLimit";
 import { z } from "zod";
 
 const orderItemSchema = z.object({
@@ -19,6 +20,14 @@ const orderCreateSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const limit = checkOrderRateLimit(req);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Espera un momento e intenta de nuevo." },
+      { status: 429, headers: limit.retryAfter ? { "Retry-After": String(limit.retryAfter) } : undefined }
+    );
+  }
+
   try {
     const json = await req.json();
     const { customerName, customerEmail, customerPhone, shippingAddress, shippingCity, items } =
@@ -137,45 +146,70 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getUserFromCookie();
+  try {
+    const user = await getUserFromCookie();
 
-  if (!user) {
+    if (!user) {
+      return NextResponse.json(
+        { error: "No autenticado" },
+        { status: 401 }
+      );
+    }
+
+    const isAdmin = user.role === "ADMIN";
+
+    const { searchParams } = new URL(req.url);
+    const page = Number(searchParams.get("page") ?? "1");
+    const pageSize = Number(searchParams.get("pageSize") ?? "20");
+    const q = searchParams.get("q")?.trim() || undefined;
+    const status = searchParams.get("status")?.trim() || undefined;
+
+    const where: Record<string, unknown> = {};
+
+    if (!isAdmin) {
+      where.userId = user.id;
+    }
+
+    if (status && ["PENDING", "PAID", "SHIPPED", "CANCELLED"].includes(status)) {
+      where.status = status;
+    }
+
+    if (q && q.length >= 1) {
+      where.OR = [
+        { id: { contains: q, mode: "insensitive" } },
+        { customerName: { contains: q, mode: "insensitive" } },
+        { customerEmail: { contains: q, mode: "insensitive" } },
+        { shippingCity: { contains: q, mode: "insensitive" } }
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          items: {
+            include: {
+              product: true
+            }
+          },
+          user: true
+        }
+      }),
+      prisma.order.count({ where })
+    ]);
+
+    return NextResponse.json({ items, total, page, pageSize });
+  } catch (error) {
+    console.error("[api/orders GET]", error);
+    const message = error instanceof Error ? error.message : "Error al cargar órdenes";
+    const isDev = process.env.NODE_ENV === "development";
     return NextResponse.json(
-      { error: "No autenticado" },
-      { status: 401 }
+      { error: "Error al cargar órdenes", detail: isDev ? message : undefined },
+      { status: 500 }
     );
   }
-
-  const isAdmin = user.role === "ADMIN";
-
-  const { searchParams } = new URL(req.url);
-  const page = Number(searchParams.get("page") ?? "1");
-  const pageSize = Number(searchParams.get("pageSize") ?? "20");
-
-  const where: any = {};
-
-  if (!isAdmin) {
-    where.userId = user.id;
-  }
-
-  const [items, total] = await Promise.all([
-    prisma.order.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      include: {
-        items: {
-          include: {
-            product: true
-          }
-        },
-        user: true
-      }
-    }),
-    prisma.order.count({ where })
-  ]);
-
-  return NextResponse.json({ items, total, page, pageSize });
 }
 
